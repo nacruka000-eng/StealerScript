@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MrFeast Project | HTML & Python программист</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 3D линии с градиентом (динамические анимированные линии) */
+        .line-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .line {
+            position: absolute;
+            background: linear-gradient(90deg, rgba(168,85,247,0), rgba(168,85,247,0.5), rgba(236,72,153,0.5), rgba(168,85,247,0));
+            height: 2px;
+            width: 100%;
+            filter: blur(2px);
+            animation: moveLine 14s linear infinite;
+            opacity: 0.6;
+        }
+
+        .line:nth-child(1) { top: 15%; animation-duration: 18s; opacity: 0.5; transform: rotate(5deg); width: 130%; left: -15%;}
+        .line:nth-child(2) { top: 35%; animation-duration: 22s; animation-delay: -3s; opacity: 0.6; transform: rotate(-3deg); width: 140%; left: -20%;}
+        .line:nth-child(3) { top: 55%; animation-duration: 16s; animation-delay: -7s; opacity: 0.5; transform: rotate(2deg);}
+        .line:nth-child(4) { top: 75%; animation-duration: 24s; animation-delay: -11s; opacity: 0.4; transform: rotate(-4deg); width: 120%; left: -10%;}
+        .line:nth-child(5) { top: 88%; animation-duration: 20s; animation-delay: -5s; opacity: 0.5; transform: rotate(1deg);}
+        
+        @keyframes moveLine {
+            0% { transform: translateX(-100%) rotate(var(--rot, 0deg)); }
+            100% { transform: translateX(100%) rotate(var(--rot, 0deg)); }
+        }
+        .line {
+            --rot: 0deg;
+        }
+        .line:nth-child(1) { --rot: 5deg; }
+        .line:nth-child(2) { --rot: -3deg; }
+        .line:nth-child(3) { --rot: 2deg; }
+        .line:nth-child(4) { --rot: -4deg; }
+        .line:nth-child(5) { --rot: 1deg; }
+
+        /* Дополнительный градиентный шум/сияние */
+        .glow-orb {
+            position: fixed;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(124,58,237,0.2), transparent 70%);
+            border-radius: 50%;
+            top: -20%;
+            right: -10%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-orb2 {
+            bottom: -20%;
+            left: -10%;
+            top: auto;
+            background: radial-gradient(circle, rgba(236,72,153,0.2), transparent 70%);
+            width: 60vw;
+            height: 60vw;
+            position: fixed;
+            filter: blur(100px);
+            pointer-events: none;
+        }
+
+        /* Главный контейнер — стеклянная карта */
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            max-width: 620px;
+            width: 100%;
+            background: rgba(20, 20, 35, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1) inset;
+            padding: 2rem 1.8rem;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: scale(1.01);
+        }
+
+        /* Заголовок */
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF 0%, #C0C0FF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .sub {
+            font-size: 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            border-left: 3px solid #a855f7;
+            padding-left: 0.75rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* Разделитель */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(168,85,247,0.6), rgba(255,255,255,0.05));
+            margin: 1.2rem 0 1.5rem 0;
+        }
+
+        /* Блок ОБО МНЕ — премиальная иконка (звезда) */
+        .about-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.8rem;
+        }
+
+        .premium-icon {
+            background: linear-gradient(145deg, #a855f7, #7c3aed);
+            width: 32px;
+            height: 32px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 12px rgba(124,58,237,0.4);
+        }
+
+        .premium-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+            stroke-width: 1.8;
+            fill: none;
+        }
+
+        .about-text {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.55;
+            font-weight: 450;
+            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+            background: rgba(255,255,255,0.02);
+            padding: 0.5rem 0;
+            border-radius: 12px;
+        }
+
+        /* Блок НАВЫКИ — премиальная иконка молнии */
+        .skills-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .bolt-icon {
+            background: linear-gradient(145deg, #f59e0b, #dc2626);
+            width: 32px;
+            height: 32px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 12px rgba(220,38,38,0.3);
+        }
+
+        .bolt-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            stroke: none;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #f0eefc;
+            letter-spacing: 0.2px;
+            transition: all 0.2s;
+        }
+
+        .skill-tag:hover {
+            background: rgba(168, 85, 247, 0.3);
+            border-color: #c084fc;
+            transform: translateY(-2px);
+        }
+
+        /* Премиальная кнопка с телеграм-иконкой */
+        .btn-wrapper {
+            margin-top: 0.5rem;
+            text-align: left;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(95deg, #a855f7, #7c3aed);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(2px);
+            text-decoration: none;
+        }
+
+        .contact-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+            background: linear-gradient(95deg, #c084fc, #8b5cf6);
+        }
+
+        .contact-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* адаптив */
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            .glass-card {
+                padding: 1.5rem;
+            }
+            .title {
+                font-size: 1.7rem;
+            }
+            .skill-tag {
+                font-size: 0.75rem;
+                padding: 0.4rem 1rem;
+            }
+            .contact-btn {
+                padding: 0.65rem 1.6rem;
+                font-size: 0.9rem;
+            }
+            .premium-icon, .bolt-icon {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        ::selection {
+            background: #a855f7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D линии с градиентом -->
+    <div class="line-3d">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </div>
+    <div class="glow-orb"></div>
+    <div class="glow-orb2"></div>
+
+    <div class="glass-card">
+        <!-- MrFeast Project -->
+        <div class="title">MrFeast Project</div>
+        <div class="sub">HTML и Python программист</div>
+
+        <div class="divider"></div>
+
+        <!-- ОБО МНЕ (премиальная иконка звезда) -->
+        <div class="about-title">
+            <div class="premium-icon">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <span>Обо мне</span>
+        </div>
+        <div class="about-text">
+            Я MrFeast, я создаю HTML и приложения (.exe) для Windows на языке программирования Python.<br>
+            Умею добавлять информацию о Python приложениях во вкладке (Свойства — Подробнее), также я создатель Антивируса на AI движке для Windows на базе Python.<br>
+            Дизайн не очень на Python, зато стабильный и понятный. На HTML там же везде всё хорошо в плане производительности и качества.
+        </div>
+
+        <!-- НАВЫКИ (премиальная иконка молния) -->
+        <div class="skills-title">
+            <div class="bolt-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 2L4 14h7l-2 8 9-12h-7l2-8z"/>
+                </svg>
+            </div>
+            <span>Навыки</span>
+        </div>
+        <div class="skills-grid">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">HTML</span>
+            <span class="skill-tag">Cyber Protect</span>
+            <span class="skill-tag">Design (HTML)</span>
+        </div>
+
+        <!-- Кнопка → Telegram @MrFeast_Official с премиальной иконкой -->
+        <div class="btn-wrapper">
+            <a href="https://t.me/MrFeast_Official" target="_blank" rel="noopener noreferrer" class="contact-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.6-1.38-.97-2.23-1.56-.99-.67-.35-1.04.22-1.64.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.2-.04-.28-.02-.12.02-1.94 1.23-5.48 3.62-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.26-1.45-.4-1.4-.85.03-.23.35-.48.96-.74 3.78-1.65 6.3-2.74 7.56-3.28 3.6-1.52 4.35-1.78 4.84-1.79.11 0 .35.03.5.18.13.12.16.29.18.44-.01.11-.04.25-.07.44z"/>
+                </svg>
+                НАПИСАТЬ МНЕ
+            </a>
+        </div>
+    </div>
+</body>
+</html>
